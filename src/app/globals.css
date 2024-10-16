@@ -10,3 +10,15 @@
     rgba(43, 45, 56, 1) 64%
   );
 }
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #000000;
+}
+/* Cor do scrollbar */
+*::-webkit-scrollbar-thumb {
+  background-color: #374151;
+  border-radius: 14px;
+}
