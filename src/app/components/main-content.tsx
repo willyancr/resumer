@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import Loader from "./loader";
+import ButtonResumer from "./button";
 
 type Article = {
   title: string;
@@ -9,19 +11,23 @@ type Article = {
 };
 
 export default function MainContent() {
-  const [url, setUrl] = useState<string>("");
   const [article, setArticle] = useState<Article>({
     title: "",
     content: "",
     excerpt: "",
     summary: "",
   });
+  const [url, setUrl] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setLoading(true);
     if (!url) {
       console.error("URL inválida");
+      alert("URL inválida");
+      setLoading(false);
       return;
     }
 
@@ -39,9 +45,11 @@ export default function MainContent() {
       })
       .then((data) => {
         setArticle(data);
+        setLoading(false);
       })
-      .catch((error) => {
-        console.error("Falha ao buscar conteúdo da URL", error);
+      .catch((err) => {
+        console.error("Falha ao buscar conteúdo da URL", err);
+        setLoading(false);
       });
   };
 
@@ -67,22 +75,25 @@ export default function MainContent() {
             value={url}
             onChange={(e) => setUrl(e.target.value)}
           />
-          <button
-            type="submit"
-            className="w-full rounded-md bg-zinc-200 px-4 py-3 text-lg font-semibold text-zinc-950 transition-colors hover:bg-zinc-300 sm:w-auto"
-          >
-            Resumer
-          </button>
+          {loading ? <ButtonResumer disabled /> : <ButtonResumer />}
         </form>
-        <div>
-          {article && (
-            <div className="h-[400px] w-full overflow-y-auto rounded-md bg-zinc-800 px-4 py-4 font-semibold outline-0 sm:px-6">
+        <div className="h-[400px] w-full overflow-y-auto rounded-md bg-zinc-800 px-4 py-4 font-semibold outline-0 sm:px-6">
+          {loading ? (
+            <div className="flex h-full items-center justify-center">
+              <Loader />
+            </div>
+          ) : article.title ? (
+            <div>
               <h1 className="text-2xl text-zinc-300">{article.title}</h1>
               <p className="mb-4 italic text-zinc-400">{article.excerpt}</p>
               <p className="font-poppins mb-4 text-zinc-300">
                 {article.summary}
               </p>
             </div>
+          ) : (
+            <p className="text-center text-zinc-400">
+              Cole uma URL e clique em Resumer para ver o resumo aqui.
+            </p>
           )}
         </div>
       </div>

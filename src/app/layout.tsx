@@ -8,9 +8,10 @@ const baloo = Baloo_Paaji_2({
 });
 
 export const metadata: Metadata = {
-  title: "Resumer",
+  title: "Resumer | Resumos inteligentes",
   description:
     "O Resumer é uma ferramenta que utiliza IA para gerar resumos concisos de matérias jornalísticas a partir de URLs. Simplifique sua leitura com resumos rápidos, precisos e fáceis de entender.",
+    
 };
 
 export default function RootLayout({
