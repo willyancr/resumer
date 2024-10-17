@@ -36,14 +36,14 @@ export async function POST(req: Request) {
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
       generationConfig: {
-        maxOutputTokens: 350,
+        maxOutputTokens: 500,
         temperature: 0,
         topK: 1,
         topP: 1,
       },
     });
-    const prompt = `Você é um assistente especializado em resumir artigos. Faça um resumo conciso e informativo do seguinte texto: "${article?.textContent}", sem usar formatação markdown. O resumo deve ter no máximo 300 tokens e terminar com uma frase completa.
-    Importante: Certifique-se de que o resumo termine com uma frase completa, mesmo que isso signifique usar menos de 300 tokens.`;
+    const prompt = `Você é um assistente especializado em resumir artigos. Faça um resumo conciso e informativo do seguinte texto: "${article?.textContent}", sem usar formatação markdown. O resumo deve ter no máximo 490 tokens e terminar com uma frase completa.
+    Importante: Certifique-se de que o resumo termine com uma frase completa, mesmo que isso signifique usar menos de 490 tokens.`;
 
     const result = await model.generateContent(prompt);
     const summary = result.response.text().trim();
