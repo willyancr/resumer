@@ -9,20 +9,22 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@mozilla/readability": "^0.5.0",
     "@tabler/icons-react": "^3.19.0",
     "axios": "^1.7.7",
     "jsdom": "^25.0.1",
     "next": "14.2.15",
-    "openai": "^4.67.3",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "wordwrap": "^1.0.0"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/wordwrap": "^1.0.3",
     "eslint": "^8",
     "eslint-config-next": "14.2.15",
     "postcss": "^8",

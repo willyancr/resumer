@@ -1,6 +1,9 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Readability } from "@mozilla/readability";
-import axios from "axios";
 import { JSDOM } from "jsdom";
+import axios from "axios";
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
 
 export async function POST(req: Request) {
   try {
@@ -29,6 +32,22 @@ export async function POST(req: Request) {
     // Extrair o conteúdo principal da página
     const article = reader.parse();
 
+    //Gerar resumo usando o Gemini
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        maxOutputTokens: 350,
+        temperature: 0,
+        topK: 1,
+        topP: 1,
+      },
+    });
+    const prompt = `Você é um assistente especializado em resumir artigos. Faça um resumo conciso e informativo do seguinte texto: "${article?.textContent}", sem usar formatação markdown. O resumo deve ter no máximo 300 tokens e terminar com uma frase completa.
+    Importante: Certifique-se de que o resumo termine com uma frase completa, mesmo que isso signifique usar menos de 300 tokens.`;
+
+    const result = await model.generateContent(prompt);
+    const summary = result.response.text().trim();
+
     // Verificar se o Readability conseguiu processar o conteúdo
     if (!article) {
       console.error("Erro: Readability não conseguiu processar o conteúdo");
@@ -44,6 +63,7 @@ export async function POST(req: Request) {
         title: article?.title,
         excerpt: article?.excerpt,
         content: article?.textContent,
+        summary: summary,
       }),
       {
         status: 200,

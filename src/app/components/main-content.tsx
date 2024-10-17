@@ -1,41 +1,21 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type Article = {
   title: string;
   content: string;
   excerpt: string;
+  summary: string;
 };
 
 export default function MainContent() {
   const [url, setUrl] = useState<string>("");
-  const [optimizeContent, setOptimizeContent] = useState<string>("");
   const [article, setArticle] = useState<Article>({
     title: "",
     content: "",
     excerpt: "",
+    summary: "",
   });
-
-  // Função para remover imagens do conteúdo HTML
-  const removeImagesHtml = (html: string) => {
-    // Cria um novo documento HTML a partir da string
-    const doc = new DOMParser().parseFromString(html, "text/html");
-
-    const images = doc.querySelectorAll("img");
-
-    images.forEach((image) => image.remove());
-    // Retorna o HTML do corpo do documento sem as imagens
-    return doc.body.innerHTML;
-  };
-
-  // Efeito que é executado sempre que o conteúdo do artigo muda
-  useEffect(() => {
-    if (article.content) {
-      const optimize = removeImagesHtml(article.content);
-
-      setOptimizeContent(optimize);
-    }
-  }, [article.content]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -97,13 +77,11 @@ export default function MainContent() {
         <div>
           {article && (
             <div className="h-[400px] w-full overflow-y-auto rounded-md bg-zinc-800 px-4 py-4 font-semibold outline-0 sm:px-6">
-              <h1 className="text-xl text-zinc-300">{article.title}</h1>
-              <p className="mb-4 italic text-zinc-300">{article.excerpt}</p>
-              {/* O uso dangerouslySetInnerHTML é responsável por permitir que o conteúdo HTML seja renderizado corretamente. */}
-              <div
-                className="prose mb-4 text-zinc-300"
-                dangerouslySetInnerHTML={{ __html: optimizeContent }}
-              />
+              <h1 className="text-2xl text-zinc-300">{article.title}</h1>
+              <p className="mb-4 italic text-zinc-400">{article.excerpt}</p>
+              <p className="font-poppins mb-4 text-zinc-300">
+                {article.summary}
+              </p>
             </div>
           )}
         </div>

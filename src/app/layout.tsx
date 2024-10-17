@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
-import { Poppins, Baloo_Paaji_2 } from "next/font/google";
+import { Baloo_Paaji_2 } from "next/font/google";
 import "./globals.css";
-
-const poppins = Poppins({
-  weight: ["400", "500", "600", "700"],
-  subsets: ["latin"],
-});
 
 const baloo = Baloo_Paaji_2({
   weight: ["400", "500", "600", "700"],
@@ -25,7 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <body className={`${poppins.className} ${baloo.className} bg-gradient-hero text-zinc-50`}>{children}</body>
+      <body className={` ${baloo.className} bg-gradient-hero text-zinc-50`}>
+        {children}
+      </body>
     </html>
   );
 }
