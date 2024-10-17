@@ -42,8 +42,8 @@ export async function POST(req: Request) {
     return new Response(
       JSON.stringify({
         title: article?.title,
-        content: article?.content,
         excerpt: article?.excerpt,
+        content: article?.textContent,
       }),
       {
         status: 200,
