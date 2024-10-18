@@ -1,4 +1,9 @@
-import { IconBrandGithub, IconBrandLinkedin, IconBrandX, IconFileBroken } from "@tabler/icons-react";
+import {
+  IconBrandGithub,
+  IconDeviceImac,
+  IconFileBroken,
+} from "@tabler/icons-react";
+import RedirectMidiaSocial from "./redirect-midia-social";
 
 export default function Header() {
   return (
@@ -8,10 +13,13 @@ export default function Header() {
           <IconFileBroken size={36} stroke={1.5} />
           Resumer
         </h1>
-        <div className="text-lg text-white flex items-center gap-2">
-          <IconBrandGithub stroke={1}/>
-          <IconBrandX stroke={1} />
-          <IconBrandLinkedin stroke={1} />
+        <div className="flex items-center gap-2 text-lg text-white">
+          <RedirectMidiaSocial href="https://github.com/willyancr">
+            <IconBrandGithub stroke={1} />
+          </RedirectMidiaSocial>
+          <RedirectMidiaSocial href="https://meuportfolio-wcr.vercel.app/">
+            <IconDeviceImac stroke={1} />
+          </RedirectMidiaSocial>
         </div>
       </div>
     </header>

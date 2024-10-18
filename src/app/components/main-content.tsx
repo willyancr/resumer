@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
+import ButtonCopy from "./button-copy";
+import ButtonResumer from "./button-resumer";
 import Loader from "./loader";
-import ButtonResumer from "./button";
 
 type Article = {
   title: string;
@@ -77,6 +78,7 @@ export default function MainContent() {
           />
           {loading ? <ButtonResumer disabled /> : <ButtonResumer />}
         </form>
+
         <div className="h-[400px] w-full overflow-y-auto rounded-md bg-zinc-800 px-4 py-4 font-semibold outline-0 sm:px-6">
           {loading ? (
             <div className="flex h-full items-center justify-center">
@@ -84,7 +86,15 @@ export default function MainContent() {
             </div>
           ) : article.title ? (
             <div>
-              <h1 className="text-2xl text-zinc-300">{article.title}</h1>
+              <div className="flex items-start justify-between">
+                <h1 className="text-2xl text-zinc-300">{article.title}</h1>
+
+                <ButtonCopy
+                  title={article.title}
+                  excerpt={article.excerpt}
+                  sumary={article.summary}
+                />
+              </div>
               <p className="mb-4 italic text-zinc-400">{article.excerpt}</p>
               <p className="font-poppins mb-4 text-zinc-300">
                 {article.summary}
@@ -92,7 +102,9 @@ export default function MainContent() {
             </div>
           ) : (
             <p className="text-center text-zinc-400">
-              Cole uma URL e clique em Resumer para ver o resumo aqui.
+              Cole uma URL e clique em{" "}
+              <strong className="text-zinc-200">Resumer</strong> para ver o
+              resumo aqui.
             </p>
           )}
         </div>
