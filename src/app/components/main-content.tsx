@@ -46,6 +46,7 @@ export default function MainContent() {
       })
       .then((data) => {
         setArticle(data);
+        setUrl("");
         setLoading(false);
       })
       .catch((err) => {
