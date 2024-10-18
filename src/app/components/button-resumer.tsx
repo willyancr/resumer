@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 
-/* eslint-disable @typescript-eslint/no-empty-object-type */
-interface ButtonProps extends React.ComponentProps<"button"> {}
+interface ButtonProps extends React.ComponentProps<"button"> {
+  disabled?: boolean;
+}
 
 export default function ButtonResumer({ ...props }: ButtonProps) {
   return (
