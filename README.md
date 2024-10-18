@@ -8,6 +8,7 @@ Resumer é um aplicativo web que utiliza Inteligência Artificial para gerar res
 - Remoção de imagens e conteúdo irrelevante
 - Resumo automatizado utilizando Inteligência Artificial
 - Exibição do título, resumo e conteúdo processado
+- Copy to clipboard
 
 ## Tecnologias Utilizadas
 
