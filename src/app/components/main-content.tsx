@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
-import ButtonCopy from "./button-copy";
 import ButtonResumer from "./button-resumer";
+import ButtonCopy from "./button-copy";
+import { useState } from "react";
 import Loader from "./loader";
 
 type Article = {
