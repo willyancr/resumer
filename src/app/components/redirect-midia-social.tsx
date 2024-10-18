@@ -7,7 +7,7 @@ export default function RedirectMidiaSocial({
   ...props
 }: RedirectProps) {
   return (
-    <a target="_blank" className="transition hover:text-yellow-900" {...props}>
+    <a target="_blank" className="transition-all hover:scale-110" {...props}>
       {children}
     </a>
   );

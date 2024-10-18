@@ -2,14 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-.bg-gradient-hero {
-  background: rgb(46, 46, 46);
-  background: radial-gradient(
-    circle,
-    rgba(46, 46, 46, 1) 0%,
-    rgba(43, 45, 56, 1) 64%
-  );
-}
+
 *::-webkit-scrollbar {
   width: 8px;
 }
@@ -21,4 +14,52 @@
 *::-webkit-scrollbar-thumb {
   background-color: #374151;
   border-radius: 14px;
+}
+@layer base {
+  :root {
+    /* Name: custom color palette
+       Author: Ilias Ism
+       URL: https://gradient.page */
+
+    /* CSS: .bg-gradient { background: var(--gradient) } */
+    --gradient: linear-gradient(to top left,#20002c,#cbb4d4);
+    --background: 301 100% 98.18%;
+    --foreground: 301 10% 0.36%;
+
+    --muted: 301 10% 90.9%;
+    --muted-foreground: 301 5% 40.9%;
+
+    --popover: 301 10% 90.9%;
+    --popover-foreground: 301 10% 0.44999999999999996%;
+
+    --card: 301 10% 90.9%;
+    --card-foreground: 301 10% 0.44999999999999996%;
+
+    --border: 301 15% 89.36%;
+    --input: 301 15% 89.36%;
+
+    --primary: 301 100% 9%;
+    --primary-foreground: 301 2% 90.9%;
+
+    --secondary: 301 5% 95.45%;
+    --secondary-foreground: 301 7% 10.9%;
+
+    --accent: 301 5% 95.45%;
+    --accent-foreground: 301 7% 10.9%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --ring: 301 100% 9%;
+
+    --radius: 0.5rem;
+  }
+}
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

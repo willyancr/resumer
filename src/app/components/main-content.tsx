@@ -3,6 +3,7 @@ import ButtonResumer from "./button-resumer";
 import ButtonCopy from "./button-copy";
 import { useState } from "react";
 import Loader from "./loader";
+import { Input } from "@/components/ui/input";
 
 type Article = {
   title: string;
@@ -58,29 +59,32 @@ export default function MainContent() {
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center justify-between gap-12 px-4 py-8 md:px-12">
       <div className="mx-auto w-full max-w-[700px]">
-        <h1 className="text-center text-xl font-bold text-zinc-300 md:text-2xl">
+        <h1 className="text-center text-xl font-bold text-primary md:text-2xl">
           Com o{" "}
-          <span className="text-2xl text-zinc-50 md:text-3xl">Resumer</span>,
-          você obtém resumos inteligentes e rápidos das matérias que desejar,
+          <span className="bg-gradient-custom bg-clip-text text-2xl text-transparent md:text-3xl">
+            Resumer
+          </span>
+          , você obtém resumos inteligentes e rápidos das matérias que desejar,
           usando o poder da Inteligência Artificial.
         </h1>
       </div>
       <div className="flex w-full max-w-[700px] flex-col gap-12">
         <form
           onSubmit={handleSubmit}
-          className="mx-auto flex w-full flex-col items-center justify-between gap-2 rounded-xl border border-zinc-500 px-4 py-3 sm:flex-row sm:px-6"
+          className="mx-auto flex w-full flex-col items-center justify-between gap-2 rounded-xl border px-4 py-3 sm:flex-row sm:px-6"
         >
-          <input
-            type="text"
+          <Input
+            type="url"
             placeholder="Cole a URL"
-            className="mb-2 w-full rounded-md bg-zinc-800 px-4 py-3 font-semibold outline-0 sm:mb-0 sm:w-[calc(100%-120px)]"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
+            className="text-primary"
           />
+
           {loading ? <ButtonResumer disabled /> : <ButtonResumer />}
         </form>
 
-        <div className="h-[400px] w-full overflow-y-auto rounded-md bg-zinc-800 px-4 py-4 font-semibold outline-0 sm:px-6">
+        <div className="h-[400px] w-full overflow-y-auto rounded-md bg-primary/10 px-4 py-4 font-semibold outline-0 sm:px-6">
           {loading ? (
             <div className="flex h-full items-center justify-center">
               <Loader />
@@ -88,7 +92,7 @@ export default function MainContent() {
           ) : article.title ? (
             <div>
               <div className="flex items-start justify-between">
-                <h1 className="text-2xl text-zinc-300">{article.title}</h1>
+                <h1 className="text-2xl text-zinc-950">{article.title}</h1>
 
                 <ButtonCopy
                   title={article.title}
@@ -96,16 +100,16 @@ export default function MainContent() {
                   sumary={article.summary}
                 />
               </div>
-              <p className="mb-4 italic text-zinc-400">{article.excerpt}</p>
-              <p className="font-poppins mb-4 text-zinc-300">
+              <p className="mb-4 italic text-zinc-700">{article.excerpt}</p>
+              <p className="font-poppins mb-4 text-primary">
                 {article.summary}
               </p>
             </div>
           ) : (
-            <p className="text-center text-zinc-400">
+            <p className="text-center text-primary">
               Cole uma URL e clique em{" "}
-              <strong className="text-zinc-200">Resumer</strong> para ver o
-              resumo aqui.
+              <strong className="text-secondary-foreground">Resumer</strong>{" "}
+              para ver o resumo aqui.
             </p>
           )}
         </div>

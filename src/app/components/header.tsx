@@ -7,13 +7,13 @@ import RedirectMidiaSocial from "./redirect-midia-social";
 
 export default function Header() {
   return (
-    <header className="bg-[#2b2d38] shadow-lg">
+    <header className="bg-gradient shadow-lg">
       <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-4 py-8 md:px-12">
-        <h1 className="flex items-center gap-1 text-4xl font-bold text-zinc-50">
-          <IconFileBroken size={36} stroke={1.5} />
+        <h1 className="bg-gradient-custom flex items-center gap-1 bg-clip-text text-4xl font-bold text-transparent">
+          <IconFileBroken size={36} stroke={1} className="text-primary" />
           Resumer
         </h1>
-        <div className="flex items-center gap-2 text-lg text-white">
+        <div className="flex items-center gap-2 text-lg text-primary">
           <RedirectMidiaSocial href="https://github.com/willyancr">
             <IconBrandGithub stroke={1} />
           </RedirectMidiaSocial>

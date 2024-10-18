@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <body className={` ${baloo.className} bg-gradient-hero text-zinc-50`}>
+      <body className={` ${baloo.className}  text-zinc-50`}>
         {children}
       </body>
     </html>
