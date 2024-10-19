@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     const article = reader.parse();
 
     //Gerar resumo usando o Gemini
-    const model = genAI.getGenerativeModel({
+    const modelSummary = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
       generationConfig: {
         maxOutputTokens: 500,
@@ -45,8 +45,23 @@ export async function POST(req: Request) {
     const prompt = `Você é um assistente especializado em resumir artigos. Faça um resumo conciso e informativo do seguinte texto: "${article?.textContent}", sem usar formatação markdown. O resumo deve ter no máximo 490 tokens e terminar com uma frase completa.
     Importante: Certifique-se de que o resumo termine com uma frase completa, mesmo que isso signifique usar menos de 490 tokens.`;
 
-    const result = await model.generateContent(prompt);
+    const result = await modelSummary.generateContent(prompt);
     const summary = result.response.text().trim();
+
+    //Gerar resumo pra twitter usando o Gemini
+    const modelTwitter = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        maxOutputTokens: 280,
+        temperature: 0,
+        topK: 1,
+        topP: 1,
+      },
+    });
+    const promptTwitter = `Você é um assistente especializado em gerar tweets de notícias. Com base no seguinte texto: '${article?.textContent}', crie um tweet altamente conciso, informativo e atrativo que resuma o ponto principal do artigo. O tweet deve conter no máximo 280 caracteres (incluindo espaços), ser fácil de entender e instigante. Evite o uso de formatação markdown e certifique-se de que a última frase seja completa, mesmo que o tweet fique com menos de 280 caracteres. Se relevante, considere incluir uma hashtag ou uma chamada para ação apropriada.`;
+
+    const resultTwitter = await modelTwitter.generateContent(promptTwitter);
+    const summaryTwitter = resultTwitter.response.text().trim();
 
     // Verificar se o Readability conseguiu processar o conteúdo
     if (!article) {
@@ -64,6 +79,7 @@ export async function POST(req: Request) {
         excerpt: article?.excerpt,
         content: article?.textContent,
         summary: summary,
+        summaryTwitter: summaryTwitter,
       }),
       {
         status: 200,

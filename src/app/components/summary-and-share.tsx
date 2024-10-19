@@ -11,6 +11,7 @@ type Article = {
   title: string;
   excerpt: string;
   summary: string;
+  summaryTwitter: string;
 };
 
 export default function ArticleSummaryCard({
@@ -23,12 +24,15 @@ export default function ArticleSummaryCard({
   const [activeTab, setActiveTab] = useState("summary");
   const [copied, setCopied] = useState(false);
 
-  const articleTitle = "The Future of Artificial Intelligence";
-
-  const tweetTemplate = `Just read an fascinating article on "${articleTitle}"! Key takeaway: AI is set to transform multiple industries. #AI #FutureTech `;
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(tweetTemplate);
+  const copyToClipboardSummary = () => {
+    navigator.clipboard.writeText(
+      `${article.title}\n${article.excerpt}\n\n${article.summary}`,
+    );
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  const copyToClipboardSummaryTwitter = () => {
+    navigator.clipboard.writeText(article.summaryTwitter);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -59,7 +63,7 @@ export default function ArticleSummaryCard({
                 </p>
                 <p className="mt-4 text-gray-600">{article.summary}</p>
                 <Button
-                  onClick={copyToClipboard}
+                  onClick={copyToClipboardSummary}
                   className="ml-auto mt-5 flex items-center space-x-2"
                 >
                   <Copy className="h-4 w-4" />
@@ -79,13 +83,13 @@ export default function ArticleSummaryCard({
             className="mt-4 h-[350px] rounded-md bg-background p-4"
           >
             <div className="space-y-4">
-              <p className="text-sm text-gray-600">{tweetTemplate}</p>
+              <p className="text-sm text-gray-600">{article.summaryTwitter}</p>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-400">
-                  {tweetTemplate.length}/280 caracteres
+                  {article.summaryTwitter.length}/280 caracteres
                 </span>
                 <Button
-                  onClick={copyToClipboard}
+                  onClick={copyToClipboardSummaryTwitter}
                   className="flex items-center space-x-2"
                 >
                   <Copy className="h-4 w-4" />

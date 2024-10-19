@@ -9,6 +9,7 @@ type Article = {
   content: string;
   excerpt: string;
   summary: string;
+  summaryTwitter: string;
 };
 
 export default function MainContent() {
@@ -17,6 +18,7 @@ export default function MainContent() {
     content: "",
     excerpt: "",
     summary: "",
+    summaryTwitter: "",
   });
   const [url, setUrl] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
