@@ -74,7 +74,7 @@ export default function ArticleSummaryCard({
               <p className="text-center text-primary">
                 Cole uma URL e clique em{" "}
                 <strong className="text-secondary-foreground">Resumer</strong>{" "}
-                para ver o resumo aqui.
+                para ver o resumo.
               </p>
             )}
           </TabsContent>
@@ -82,21 +82,31 @@ export default function ArticleSummaryCard({
             value="twitter"
             className="mt-4 h-[350px] rounded-md bg-background p-4"
           >
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">{article.summaryTwitter}</p>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-400">
-                  {article.summaryTwitter.length}/280 caracteres
-                </span>
-                <Button
-                  onClick={copyToClipboardSummaryTwitter}
-                  className="flex items-center space-x-2"
-                >
-                  <Copy className="h-4 w-4" />
-                  <span>{copied ? "Copiado!" : "Copiar Tweet"}</span>
-                </Button>
+            {article.summaryTwitter ? (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  {article.summaryTwitter}
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-400">
+                    {article.summaryTwitter.length}/280 caracteres
+                  </span>
+                  <Button
+                    onClick={copyToClipboardSummaryTwitter}
+                    className="flex items-center space-x-2"
+                  >
+                    <Copy className="h-4 w-4" />
+                    <span>{copied ? "Copiado!" : "Copiar Tweet"}</span>
+                  </Button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <p className="text-center text-primary">
+                Cole uma URL e clique em{" "}
+                <strong className="text-secondary-foreground">Resumer</strong>{" "}
+                para ter tweet personalizado.
+              </p>
+            )}
           </TabsContent>
         </Tabs>
       </CardContent>
