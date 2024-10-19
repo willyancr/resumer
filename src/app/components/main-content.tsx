@@ -1,9 +1,8 @@
 "use client";
-import ButtonResumer from "./button-resumer";
-import ButtonCopy from "./button-copy";
-import { useState } from "react";
-import Loader from "./loader";
+import ArticleSummaryCard from "./summary-and-share";
 import { Input } from "@/components/ui/input";
+import ButtonResumer from "./button-resumer";
+import { useState } from "react";
 
 type Article = {
   title: string;
@@ -83,36 +82,7 @@ export default function MainContent() {
 
           {loading ? <ButtonResumer disabled /> : <ButtonResumer />}
         </form>
-
-        <div className="h-[400px] w-full overflow-y-auto rounded-md bg-primary/10 px-4 py-4 font-semibold outline-0 sm:px-6">
-          {loading ? (
-            <div className="flex h-full items-center justify-center">
-              <Loader />
-            </div>
-          ) : article.title ? (
-            <div>
-              <div className="flex items-start justify-between">
-                <h1 className="text-2xl text-zinc-950">{article.title}</h1>
-
-                <ButtonCopy
-                  title={article.title}
-                  excerpt={article.excerpt}
-                  sumary={article.summary}
-                />
-              </div>
-              <p className="mb-4 italic text-zinc-700">{article.excerpt}</p>
-              <p className="font-poppins mb-4 text-primary">
-                {article.summary}
-              </p>
-            </div>
-          ) : (
-            <p className="text-center text-primary">
-              Cole uma URL e clique em{" "}
-              <strong className="text-secondary-foreground">Resumer</strong>{" "}
-              para ver o resumo aqui.
-            </p>
-          )}
-        </div>
+        <ArticleSummaryCard article={article} loading={loading} />
       </div>
     </div>
   );
