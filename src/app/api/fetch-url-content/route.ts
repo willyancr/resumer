@@ -1,83 +1,142 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
 import axios from "axios";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
+async function callGemini(
+  prompt: string,
+  generationConfig: {
+    maxOutputTokens: number;
+    temperature: number;
+    topK: number;
+    topP: number;
+  },
+): Promise<string> {
+  const model = "gemini-2.5-flash-preview-09-2025";
+  const apiKey = process.env.GEMINI_API_KEY || "";
+  
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
+  const payload = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: generationConfig,
+    systemInstruction: {
+      parts: [{ text: "Você é um assistente especializado em processar e resumir textos de artigos da web." }]
+    },
+  };
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error("Erro na API Gemini:", response.status, errorBody);
+      throw new Error(`Falha na API Gemini: ${response.status}`);
+    }
+
+    const result = await response.json();
+    
+    // Extração segura do texto da resposta
+    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!text) {
+      // Se o texto não estiver presente, mas a razão de finalização for MAX_TOKENS,
+      // lançamos um erro específico que podemos tratar.
+      if (result.candidates?.[0]?.finishReason === "MAX_TOKENS") {
+          console.error("Erro: A resposta foi cortada por MAX_TOKENS.", JSON.stringify(result, null, 2));
+          throw new Error("A geração de resposta excedeu o limite máximo de tokens.");
+      }
+      
+      console.error("Resposta inesperada da API Gemini (sem texto):", JSON.stringify(result, null, 2));
+      throw new Error("Não foi possível extrair o texto da resposta da API.");
+    }
+
+    return text.trim();
+
+  } catch (error) {
+    console.error("Erro ao chamar callGemini:", error);
+    // Repassa a mensagem de erro original
+    const errorMessage = (error instanceof Error) ? error.message : "Falha ao comunicar com a API Generativa.";
+    throw new Error(errorMessage);
+  }
+}
+
+// Handler da rota POST
 export async function POST(req: Request) {
   try {
-    // Extrair a URL do corpo da requisição
+    // 1. Extrair e validar a URL
     const { url } = await req.json();
     console.log("URL RECEBIDA", url);
 
-    // Validar a URL antes de prosseguir
     try {
       new URL(url);
     } catch {
-      // Retornar erro se a URL for inválida
       return new Response(JSON.stringify({ error: "URL inválida" }), {
         status: 400,
+        headers: { "Content-Type": "application/json" },
       });
     }
 
-    // Fazer a requisição GET para a URL fornecida
-    const response = await axios.get(url);
-    console.log("Status da resposta:", response.status);
+    // 2. Buscar e processar o conteúdo da página
+    const response = await axios.get(url, {
+      // Adiciona headers para simular um navegador, melhorando a chance de sucesso
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9,pt;q=0.8',
+      }
+    });
+    console.log("Status da resposta HTTP:", response.status);
 
-    // Criar um DOM a partir do conteúdo HTML recebido
     const dom = new JSDOM(response.data, { url });
-    // Inicializar o Readability com o documento do DOM
     const reader = new Readability(dom.window.document);
-    // Extrair o conteúdo principal da página
     const article = reader.parse();
 
-    //Gerar resumo usando o Gemini
-    const modelSummary = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      generationConfig: {
-        maxOutputTokens: 500,
-        temperature: 0,
-        topK: 1,
-        topP: 1,
-      },
-    });
-    const prompt = `Você é um assistente especializado em resumir artigos. Faça um resumo conciso e informativo do seguinte texto: "${article?.textContent}", sem usar formatação markdown. O resumo deve ter no máximo 490 tokens e terminar com uma frase completa.
-    Importante: Certifique-se de que o resumo termine com uma frase completa, mesmo que isso signifique usar menos de 490 tokens.`;
-
-    const result = await modelSummary.generateContent(prompt);
-    const summary = result.response.text().trim();
-
-    //Gerar resumo pra twitter usando o Gemini
-    const modelTwitter = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      generationConfig: {
-        maxOutputTokens: 280,
-        temperature: 0,
-        topK: 1,
-        topP: 1,
-      },
-    });
-    const promptTwitter = `Você é um assistente especializado em gerar tweets de notícias. Com base no seguinte texto: '${article?.textContent}', crie um tweet altamente conciso, informativo e atrativo que resuma o ponto principal do artigo. O tweet deve conter no máximo 280 caracteres (incluindo espaços), ser fácil de entender e instigante. Evite o uso de formatação markdown e certifique-se de que a última frase seja completa, mesmo que o tweet fique com menos de 280 caracteres. Se relevante, considere incluir uma hashtag ou uma chamada para ação apropriada.`;
-
-    const resultTwitter = await modelTwitter.generateContent(promptTwitter);
-    const summaryTwitter = resultTwitter.response.text().trim();
-
-    // Verificar se o Readability conseguiu processar o conteúdo
-    if (!article) {
+    // 3. Verificar se o Readability funcionou ANTES de chamar a API
+    if (!article || !article.textContent) {
       console.error("Erro: Readability não conseguiu processar o conteúdo");
       return new Response(
         JSON.stringify({ error: "Erro ao processar o conteúdo da página" }),
-        { status: 500 },
+        { status: 500, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    // Retornar o conteúdo processado
+    const articleText = article.textContent;
+
+    // 4. Gerar resumo principal usando a nova função
+    const promptSummary = `Você é um assistente especializado em resumir artigos. Faça um resumo conciso e informativo do seguinte texto: "${articleText}", sem usar formatação markdown. O resumo deve ter no máximo 490 tokens e terminar com uma frase completa.
+    Importante: Certifique-se de que o resumo termine com uma frase completa, mesmo que isso signifique usar menos de 490 tokens.`;
+    
+    const configSummary = {
+      maxOutputTokens: 2048, 
+      temperature: 0,
+      topK: 1,
+      topP: 1,
+    };
+    
+    const summary = await callGemini(promptSummary, configSummary);
+
+    // 5. Gerar resumo para o Twitter usando a nova função
+    const promptTwitter = `Você é um assistente especializado em gerar tweets de notícias. Com base no seguinte texto: '${articleText}', crie um tweet altamente conciso, informativo e atrativo que resuma o ponto principal do artigo. O tweet deve conter no máximo 280 caracteres (incluindo espaços), ser fácil de entender e instigante. Evite o uso de formatação markdown e certifique-se de que a última frase seja completa, mesmo que o tweet fique com menos de 280 caracteres. Se relevante, considere incluir uma hashtag ou uma chamada para ação apropriada.`;
+
+    const configTwitter = {
+      maxOutputTokens: 1024, 
+      temperature: 0,
+      topK: 1,
+      topP: 1,
+    };
+
+    const summaryTwitter = await callGemini(promptTwitter, configTwitter);
+
+    // 6. Retornar a resposta completa
     return new Response(
       JSON.stringify({
         title: article?.title,
         excerpt: article?.excerpt,
-        content: article?.textContent,
+        content: article?.textContent, // O conteúdo completo extraído
         summary: summary,
         summaryTwitter: summaryTwitter,
       }),
@@ -88,10 +147,14 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     // Tratar erros gerais
-    console.error("Falha ao buscar conteúdo da URL", error);
+    console.error("Falha geral no processamento:", error);
+    
+    // Fornece um erro mais específico se possível
+    const errorMessage = (error instanceof Error) ? error.message : "Falha ao buscar o conteúdo da URL";
+    
     return new Response(
-      JSON.stringify({ error: "Falha ao buscar o conteúdo da URL" }),
-      { status: 500 },
+      JSON.stringify({ error: errorMessage }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
     );
   }
 }
