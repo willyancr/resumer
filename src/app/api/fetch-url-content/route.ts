@@ -153,9 +153,13 @@ export async function POST(req: Request) {
         headers: { "Content-Type": "application/json" },
       },
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Tratar erros gerais e específicos do Axios
-    console.error("Falha geral no processamento:", error.message);
+    if (error instanceof Error) {
+      console.error("Falha geral no processamento:", error.message);
+    } else {
+      console.error("Falha geral no processamento:", error);
+    }
     
     let errorMessage = "Falha ao buscar o conteúdo da URL";
     let statusCode = 500;
