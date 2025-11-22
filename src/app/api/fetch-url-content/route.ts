@@ -1,4 +1,3 @@
-// Importações necessárias para extração de conteúdo e requisições HTTP
 import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
 import axios from "axios";
@@ -12,10 +11,9 @@ async function callGemini(
     topP: number;
   },
 ): Promise<string> {
-  // Usamos o modelo mais recente
+  
   const model = "gemini-2.5-flash-preview-09-2025";
   
-  // A chave de API é lida das variáveis de ambiente
   const apiKey = process.env.GEMINI_API_KEY || "";
   
   const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -81,8 +79,6 @@ export async function POST(req: Request) {
     }
 
     // 2. Buscar e processar o conteúdo da página com Headers Reforçados
-    // Sites protegidos por Cloudflare (como o Tecnoblog) precisam destes headers
-    // para acreditar que somos um navegador real.
     const response = await axios.get(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
@@ -96,10 +92,8 @@ export async function POST(req: Request) {
         'Sec-Fetch-Site': 'none',
         'Sec-Fetch-User': '?1',
         'Cache-Control': 'max-age=0',
-        // Referer ajuda a enganar alguns sites pensando que viemos do Google
         'Referer': 'https://www.google.com/', 
       },
-      // Timeout para evitar travamentos longos
       timeout: 10000, 
     });
     
