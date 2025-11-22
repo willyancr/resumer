@@ -29,12 +29,12 @@ export default function ArticleSummaryCard({
       `${article.title}\n${article.excerpt}\n\n${article.summary}`,
     );
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 1000);
   };
   const copyToClipboardSummaryTwitter = () => {
     navigator.clipboard.writeText(article.summaryTwitter);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 1000);
   };
 
   return (
