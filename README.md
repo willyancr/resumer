@@ -18,7 +18,7 @@ Resumer é um aplicativo web que utiliza Inteligência Artificial para gerar res
 - **Axios**: Para realizar requisições HTTP.
 - **JSDOM**: Para manipulação de DOM no lado do servidor.
 - **Mozilla Readability**: Para processar e extrair o conteúdo da página.
-- **OpenAI GPT-4**: Usado para gerar o resumo das matérias.
+- **GOOGLE GEMINI 2.5 PRO**: IA usada para gerar o resumo das matérias.
 
 ## Estrutura do Projeto
 
