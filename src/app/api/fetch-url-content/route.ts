@@ -1,75 +1,69 @@
 import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
 import axios from "axios";
+import Groq from "groq-sdk";
 
 // CONFIGURAÇÃO DO NEXT.JS (APP ROUTER)
-// Tenta aumentar o tempo limite da função na Vercel para 60 segundos (padrão é 10s no Hobby)
 export const maxDuration = 60; 
-// Força a renderização dinâmica para evitar cache estático indesejado
 export const dynamic = 'force-dynamic';
 
+// Inicializa o cliente Groq fora da função para reutilização
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
+
 /**
- * Função auxiliar para chamar a API Gemini (v1beta) via REST.
+ * Função auxiliar para chamar a API da Groq.
  */
-async function callGemini(
+async function callGroq(
   prompt: string,
-  generationConfig: {
-    maxOutputTokens: number;
+  config: {
+    max_tokens: number;
     temperature: number;
-    topK: number;
-    topP: number;
   },
+  systemPrompt: string = "Você é um assistente útil."
 ): Promise<string> {
-  const model = "gemini-2.5-flash-preview-09-2025";
-  const apiKey = process.env.GEMINI_API_KEY;
-
-  // Verificação crucial para Debug na Vercel
-  if (!apiKey) {
-    console.error("ERRO CRÍTICO: GEMINI_API_KEY não encontrada nas variáveis de ambiente.");
-    throw new Error("API Key do Gemini não configurada no servidor.");
-  }
   
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-  const payload = {
-    contents: [{ parts: [{ text: prompt }] }],
-    generationConfig: generationConfig,
-    systemInstruction: {
-      parts: [{ text: "Você é um assistente especializado em processar e resumir textos de artigos da web." }]
-    },
-  };
+  if (!process.env.GROQ_API_KEY) {
+    console.error("ERRO CRÍTICO: GROQ_API_KEY não encontrada.");
+    throw new Error("API Key da Groq não configurada no servidor.");
+  }
 
   try {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      // Llama 3 8B 
+      model: "llama-3.1-8b-instant", 
+      temperature: config.temperature,
+      max_tokens: config.max_tokens,
+      top_p: 1,
+      stream: false,
     });
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error("Erro na API Gemini:", response.status, errorBody);
-      throw new Error(`Falha na API Gemini: ${response.status}`);
+    const content = chatCompletion.choices[0]?.message?.content;
+
+    if (!content) {
+      throw new Error("A API da Groq retornou uma resposta vazia.");
     }
 
-    const result = await response.json();
-    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!text) {
-      if (result.candidates?.[0]?.finishReason === "MAX_TOKENS") {
-          console.error("Erro: A resposta foi cortada por MAX_TOKENS.", JSON.stringify(result, null, 2));
-          throw new Error("A geração de resposta excedeu o limite máximo de tokens.");
-      }
-      console.error("Resposta inesperada da API Gemini (sem texto):", JSON.stringify(result, null, 2));
-      throw new Error("Não foi possível extrair o texto da resposta da API.");
-    }
-
-    return text.trim();
+    return content.trim();
 
   } catch (error) {
-    console.error("Erro ao chamar callGemini:", error);
-    const errorMessage = (error instanceof Error) ? error.message : "Falha ao comunicar com a API Generativa.";
-    throw new Error(errorMessage);
+    console.error("Erro ao chamar Groq:", error);
+    // Tratamento de erro do SDK
+    if (error instanceof Error) {
+        throw new Error(`Erro na IA: ${error.message}`);
+    }
+    throw new Error("Falha desconhecida na comunicação com a IA.");
   }
 }
 
@@ -79,8 +73,8 @@ export async function POST(req: Request) {
     const { url } = await req.json();
     console.log("URL RECEBIDA:", url);
 
-    if (!process.env.GEMINI_API_KEY) {
-      return new Response(JSON.stringify({ error: "Configuração de API ausente no servidor (Verifique as variáveis de ambiente na Vercel)." }), {
+    if (!process.env.GROQ_API_KEY) {
+      return new Response(JSON.stringify({ error: "Configuração de API ausente no servidor (Verifique a GROQ_API_KEY)." }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
       });
@@ -95,7 +89,7 @@ export async function POST(req: Request) {
       });
     }
 
-    // Tenta buscar a página com timeout de 15s (um pouco maior para evitar falha prematura)
+    // Tenta buscar a página com timeout e headers para evitar bloqueios
     const response = await axios.get(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
@@ -130,31 +124,35 @@ export async function POST(req: Request) {
 
     const articleText = article.textContent;
 
-    // Resumo Principal
-    const promptSummary = `Você é um assistente especializado em resumir artigos. Faça um resumo conciso e informativo do seguinte texto: "${articleText}", sem usar formatação markdown. O resumo deve ter no máximo 490 tokens e terminar com uma frase completa.`;
+    // --- Resumo Principal ---
+    const promptSummary = `Faça um resumo conciso e informativo do seguinte texto: "${articleText}". Não use formatação markdown (negrito, titulos). O resumo deve ter no máximo 490 tokens e terminar com uma frase completa. Responda em Português do Brasil.`;
     
     const configSummary = {
-      maxOutputTokens: 2048, 
-      temperature: 0,
-      topK: 1,
-      topP: 1,
+      max_tokens: 1000, 
+      temperature: 0.5,
     };
     
-    // Executa em paralelo se possível, ou sequencial para evitar estourar memória se for função pequena
-    // Vamos manter sequencial para garantir estabilidade
-    const summary = await callGemini(promptSummary, configSummary);
+    // Chamada para o Resumo
+    const summary = await callGroq(
+        promptSummary, 
+        configSummary, 
+        "Você é um assistente especializado em processar e resumir textos de artigos da web."
+    );
 
-    // Resumo Twitter
-    const promptTwitter = `Você é um assistente especializado em gerar tweets de notícias. Com base no seguinte texto: '${articleText}', crie um tweet altamente conciso, informativo e atrativo que resuma o ponto principal do artigo. O tweet deve conter no máximo 280 caracteres.`;
+    // --- Resumo Twitter ---
+    const promptTwitter = `Com base no seguinte texto: '${articleText}', crie um tweet altamente conciso, informativo e atrativo que resuma o ponto principal do artigo. O tweet deve conter no máximo 280 caracteres. Não use aspas.`;
 
     const configTwitter = {
-      maxOutputTokens: 1024,
-      temperature: 0,
-      topK: 1,
-      topP: 1,
+      max_tokens: 300,
+      temperature: 0.7,
     };
 
-    const summaryTwitter = await callGemini(promptTwitter, configTwitter);
+    // Chamada para o Twitter
+    const summaryTwitter = await callGroq(
+        promptTwitter, 
+        configTwitter,
+        "Você é um especialista em redes sociais e copy para Twitter."
+    );
 
     return new Response(
       JSON.stringify({
@@ -183,7 +181,7 @@ export async function POST(req: Request) {
 
     if (axios.isAxiosError(error)) {
         if (error.response?.status === 403) {
-            errorMessage = "O site bloqueou o acesso do servidor Vercel (Erro 403). Tente rodar localmente ou usar proxies.";
+            errorMessage = "O site bloqueou o acesso do servidor (Erro 403).";
             statusCode = 403;
         } else if (error.response?.status === 404) {
              errorMessage = "Página não encontrada (404).";
