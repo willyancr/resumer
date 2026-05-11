@@ -3,6 +3,8 @@ import ArticleSummaryCard from "./summary-and-share";
 import { Input } from "@/components/ui/input";
 import ButtonResumer from "./button-resumer";
 import { useState } from "react";
+import { ClipboardPaste } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type Article = {
   title: string;
@@ -22,6 +24,15 @@ export default function MainContent() {
   });
   const [url, setUrl] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      setUrl(text);
+    } catch (err) {
+      console.error("Falha ao ler do clipboard", err);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -82,7 +93,18 @@ export default function MainContent() {
             className="text-primary"
           />
 
-          {loading ? <ButtonResumer disabled /> : <ButtonResumer />}
+          <div className="flex w-full items-center gap-2 sm:w-auto">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handlePaste}
+              className="flex items-center gap-2 border-primary/20 text-primary hover:bg-primary/5"
+            >
+              <ClipboardPaste className="h-4 w-4" />
+              <span className="sm:hidden lg:inline">Colar</span>
+            </Button>
+            {loading ? <ButtonResumer disabled /> : <ButtonResumer />}
+          </div>
         </form>
         <ArticleSummaryCard article={article} loading={loading} />
       </div>
