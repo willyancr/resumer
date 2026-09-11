@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resumer</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-icon">
+          <span>R</span>
+        </div>
+        <div>
+          <h1 class="brand-title">Resumer</h1>
+          <p class="brand-subtitle">Resumos com IA</p>
+        </div>
+      </div>
+      <button id="btn-toggle-settings" class="icon-button" title="Configurações de API">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Painel de Configurações (colapsável) -->
+    <section id="settings-panel" class="settings-panel hidden">
+      <div class="settings-content">
+        <label for="input-api-url" class="settings-label">URL do Endpoint da API:</label>
+        <div class="settings-input-group">
+          <input type="url" id="input-api-url" placeholder="http://localhost:3000/api/fetch-url-content" />
+          <button id="btn-save-settings" class="button button-sm button-primary">Salvar</button>
+        </div>
+        <p class="settings-help">Padrão local: <code>http://localhost:3000/api/fetch-url-content</code>. Se publicado na Vercel, altere aqui.</p>
+      </div>
+    </section>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+      <!-- Seção Inicial: Detecta a aba aberta -->
+      <section id="section-prompt" class="card">
+        <div class="tab-target-box">
+          <span class="badge">Página Ativa</span>
+          <p id="target-page-title" class="target-title">Carregando aba...</p>
+          <p id="target-page-url" class="target-url"></p>
+        </div>
+
+        <button id="btn-summarize-current" class="button button-primary button-block pulse-hover">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
+          </svg>
+          Resumir Página Atual
+        </button>
+
+        <details class="manual-url-details">
+          <summary>Ou resumir outra URL</summary>
+          <div class="manual-url-form">
+            <input type="url" id="input-manual-url" placeholder="https://exemplo.com/materia" />
+            <button id="btn-summarize-manual" class="button button-secondary">Resumir</button>
+          </div>
+        </details>
+      </section>
+
+      <!-- Estado de Carregamento -->
+      <section id="section-loading" class="card loading-card hidden">
+        <div class="spinner"></div>
+        <h3 class="loading-title">Gerando Resumo com IA</h3>
+        <p class="loading-desc">Processando o conteúdo da página...</p>
+      </section>
+
+      <!-- Mensagem de Erro -->
+      <section id="section-error" class="card error-card hidden">
+        <div class="error-header">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <strong class="error-title">Erro ao resumir</strong>
+        </div>
+        <p id="error-message" class="error-message"></p>
+        <button id="btn-retry" class="button button-secondary button-sm">Tentar Novamente</button>
+      </section>
+
+      <!-- Resultado do Resumo -->
+      <section id="section-results" class="card hidden">
+        <div class="results-header">
+          <h2 id="result-title" class="result-title"></h2>
+          <p id="result-excerpt" class="result-excerpt"></p>
+        </div>
+
+        <!-- Abas -->
+        <div class="tabs-nav">
+          <button id="tab-btn-summary" class="tab-btn active" data-tab="summary">Resumo</button>
+          <button id="tab-btn-twitter" class="tab-btn" data-tab="twitter">X / Twitter</button>
+        </div>
+
+        <!-- Aba Resumo -->
+        <div id="tab-content-summary" class="tab-pane active">
+          <div id="result-summary-text" class="summary-body"></div>
+          <div class="tab-footer">
+            <button id="btn-copy-summary" class="button button-primary button-sm">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+              </svg>
+              <span class="btn-copy-text">Copiar Resumo</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Aba Twitter -->
+        <div id="tab-content-twitter" class="tab-pane hidden">
+          <div id="result-twitter-text" class="summary-body twitter-body"></div>
+          <div class="tab-footer space-between">
+            <span id="twitter-char-count" class="char-count">0/280 caracteres</span>
+            <button id="btn-copy-twitter" class="button button-primary button-sm">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+              </svg>
+              <span class="btn-copy-text">Copiar Tweet</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="reset-container">
+          <button id="btn-reset" class="link-button">← Resumir outra página</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>Desenvolvido com IA • Resumer</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
