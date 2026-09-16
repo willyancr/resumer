@@ -159,10 +159,10 @@ export async function POST(req: Request) {
     }
 
     // --- Resumo Principal ---
-    const promptSummary = `Faça um resumo conciso e informativo do seguinte texto: "${articleText.slice(0, 10000)}". Não use formatação markdown (negrito, títulos). O resumo deve ter no máximo 490 tokens e terminar com uma frase completa. Responda em Português do Brasil.`;
+    const promptSummary = `Faça um resumo conciso e informativo do seguinte texto: "${articleText.slice(0, 10000)}". Não use formatação markdown (negrito, títulos). O resumo deve ter no máximo 340 tokens e terminar com uma frase completa. Responda em Português do Brasil.`;
     
     const configSummary = {
-      max_tokens: 1000, 
+      max_tokens: 700, 
       temperature: 0.5,
     };
     
