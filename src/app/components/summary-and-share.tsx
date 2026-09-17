@@ -61,7 +61,9 @@ export default function ArticleSummaryCard({
                 <p className="text-sm italic text-gray-600">
                   {article.excerpt}
                 </p>
-                <p className="mt-4 text-gray-600">{article.summary}</p>
+                <p className="mt-4 whitespace-pre-line text-sm md:text-base leading-relaxed text-gray-700 dark:text-gray-200">
+                  {article.summary}
+                </p>
                 <Button
                   onClick={copyToClipboardSummary}
                   className="ml-auto mt-5 flex items-center space-x-2"

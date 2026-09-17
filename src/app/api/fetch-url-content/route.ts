@@ -159,33 +159,45 @@ export async function POST(req: Request) {
     }
 
     // --- Resumo Principal ---
-    const promptSummary = `Faça um resumo conciso e informativo do seguinte texto: "${articleText.slice(0, 10000)}". Não use formatação markdown (negrito, títulos). O resumo deve ter no máximo 340 tokens e terminar com uma frase completa. Responda em Português do Brasil.`;
+    const promptSummary = `Crie um resumo curto, direto e objetivo do seguinte texto, destacando exclusivamente as informações mais importantes da matéria (fato principal, contexto essencial e conclusão/impacto).
+Regras estritas:
+- Seja extremamente conciso (entre 2 e 4 frases no máximo, cerca de 60 a 90 palavras).
+- Vá direto ao ponto, sem introduções redundantes (ex: não comece com "O texto aborda", "A matéria relata", etc.).
+- Não use formatação markdown (sem negrito, sem títulos ou marcadores).
+- Termine obrigatoriamente com uma frase completa.
+- Responda em Português do Brasil.
+
+Texto:
+"${articleText.slice(0, 10000)}"`;
     
     const configSummary = {
-      max_tokens: 700, 
-      temperature: 0.5,
+      max_tokens: 220, 
+      temperature: 0.3,
     };
     
     // Chamada para o Resumo
     const summary = await callGroq(
       promptSummary, 
       configSummary, 
-      "Você é um assistente especializado em processar e resumir textos de artigos da web."
+      "Você é um editor sênior especializado em sínteses ultraconcisas e objetivas de notícias."
     );
 
     // --- Resumo Twitter ---
-    const promptTwitter = `Com base no seguinte texto: '${articleText.slice(0, 10000)}', crie um tweet altamente conciso, informativo e atrativo que resuma o ponto principal do artigo. O tweet deve conter no máximo 280 caracteres. Não use aspas.`;
+    const promptTwitter = `Com base no seguinte texto, crie um tweet conciso, direto e informativo com o ponto central mais relevante da matéria. O tweet deve ter no máximo 250 caracteres, sem aspas, sem hashtags em excesso e terminar com frase completa.
+
+Texto:
+'${articleText.slice(0, 10000)}'`;
 
     const configTwitter = {
-      max_tokens: 300,
-      temperature: 0.7,
+      max_tokens: 120,
+      temperature: 0.5,
     };
 
     // Chamada para o Twitter
     const summaryTwitter = await callGroq(
       promptTwitter, 
       configTwitter,
-      "Você é um especialista em redes sociais e copy para Twitter."
+      "Você é um especialista em redes sociais e síntese de notícias para Twitter/X."
     );
 
     return new Response(
