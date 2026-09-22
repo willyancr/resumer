@@ -27,8 +27,10 @@ async function callGroq(
   systemPrompt: string = "Você é um assistente útil."
 ): Promise<string> {
   const groq = getGroqClient();
+  const model = process.env.GROQ_MODEL || "qwen/qwen3.8-27b";
 
   try {
+    const isReasoningModel = model.startsWith("openai/gpt-oss");
     const chatCompletion = await groq.chat.completions.create({
       messages: [
         {
@@ -40,9 +42,9 @@ async function callGroq(
           content: prompt,
         },
       ],
-      model: process.env.GROQ_MODEL || "groq/compound-mini", 
+      model, 
       temperature: config.temperature,
-      max_tokens: config.max_tokens,
+      max_tokens: isReasoningModel ? Math.max(config.max_tokens, 600) : config.max_tokens,
       top_p: 1,
       stream: false,
     });
