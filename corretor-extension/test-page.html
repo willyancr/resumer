@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratório de Testes - Corretor IA (Groq)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #334155;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      font-size: 12px;
+      font-weight: 700;
+      background: #064e3b;
+      color: #34d399;
+      border: 1px solid #059669;
+      padding: 3px 10px;
+      border-radius: 9999px;
+    }
+
+    p.subtitle {
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .card h2 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card p.desc {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 14px;
+    }
+
+    .sample-text {
+      background: #0f172a;
+      padding: 14px 16px;
+      border-radius: 8px;
+      border-left: 4px solid #6366f1;
+      font-size: 14px;
+      color: #cbd5e1;
+      user-select: text;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 12px;
+      font-size: 14.5px;
+      border: 1.5px solid #475569;
+      border-radius: 8px;
+      background: #0f172a;
+      color: #f1f5f9;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      border-color: #38bdf8;
+    }
+
+    .editable-box {
+      min-height: 80px;
+      padding: 14px;
+      border: 1.5px dashed #64748b;
+      border-radius: 8px;
+      background: #0f172a;
+      outline: none;
+      font-size: 14.5px;
+      color: #f1f5f9;
+    }
+
+    .editable-box:focus {
+      border-color: #a855f7;
+    }
+
+    iframe {
+      width: 100%;
+      height: 120px;
+      border: 1.5px solid #475569;
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .instructions-box {
+      background: #172554;
+      border: 1px solid #1e40af;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 24px;
+    }
+
+    .instructions-box h3 {
+      font-size: 15px;
+      color: #60a5fa;
+      margin-bottom: 8px;
+    }
+
+    .instructions-box ol {
+      padding-left: 20px;
+      color: #bfdbfe;
+      font-size: 13.5px;
+    }
+
+    .instructions-box li {
+      margin-bottom: 6px;
+    }
+
+    .instructions-box strong {
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>
+        🧪 Testes de Seleção e Substituição 
+        <span class="badge">Groq v1.0.1</span>
+      </h1>
+      <p class="subtitle">Teste o botão flutuante em campos de digitação (Input, Textarea, ContentEditable e IFrames).</p>
+    </header>
+
+    <div class="instructions-box">
+      <h3>⚠️ Importante após atualizar a extensão:</h3>
+      <ol>
+        <li>Vá em <code>chrome://extensions</code> e clique no ícone de <strong>Recarregar (🔄)</strong> no card da extensão.</li>
+        <li>Em seguida, dê <strong>F5 (recarregar)</strong> nesta página de teste ou no seu sistema ERP/CRM.</li>
+        <li>Selecione qualquer texto abaixo. O botão <strong>✨ Corrigir texto</strong> surgirá próximo ao seu cursor.</li>
+      </ol>
+    </div>
+
+    <!-- Teste 1: Input -->
+    <div class="card">
+      <h2>1. Campo &lt;input type="text"&gt;</h2>
+      <p class="desc">Selecione o texto abaixo dentro do input e clique em "Corrigir texto" -> "Substituir":</p>
+      <input type="text" value="nois vai no shoppis sabado pra asisti um filme bom" />
+    </div>
+
+    <!-- Teste 2: Textarea -->
+    <div class="card">
+      <h2>2. Área de Texto &lt;textarea&gt;</h2>
+      <p class="desc">Selecione o texto do atendimento abaixo e clique em "Substituir":</p>
+      <textarea rows="3">Cliente entrou em contato querendo alguns relatórios. Foram atendidos os relatatórios desejados.</textarea>
+    </div>
+
+    <!-- Teste 3: ContentEditable / WYSIWYG -->
+    <div class="card">
+      <h2>3. Editor Rico (ContentEditable / Estilo ERP)</h2>
+      <p class="desc">Clique, selecione qualquer palavra com erro e clique em "Substituir":</p>
+      <div class="editable-box" contenteditable="true">
+        Cliente entrou em contato querendo alguns relatórios. Foram atendidos os relatatórios desejados com suceço.
+      </div>
+    </div>
+
+    <!-- Teste 4: Editor dentro de IFRAME -->
+    <div class="card">
+      <h2>4. Editor dentro de IFRAME (TinyMCE / Summernote / CKEditor)</h2>
+      <p class="desc">Muitos sistemas ERP utilizam um iframe para o editor de texto:</p>
+      <iframe id="test-iframe"></iframe>
+    </div>
+
+    <!-- Teste 5: Texto Estático -->
+    <div class="card">
+      <h2>5. Texto Estático na Página</h2>
+      <p class="desc">Selecione o texto abaixo para abrir o modal e testar a opção "Copiar":</p>
+      <div class="sample-text">
+        ontem agente fomos na reuniao mais ninguem sabia oque faser sobre os poblema da empresa.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configura o iframe para simular um editor de texto de ERP/CRM
+    const iframe = document.getElementById('test-iframe');
+    iframe.onload = () => {
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        doc.designMode = 'on';
+        doc.body.style.fontFamily = 'Segoe UI, sans-serif';
+        doc.body.style.fontSize = '14px';
+        doc.body.style.padding = '12px';
+        doc.body.style.margin = '0';
+        doc.body.style.color = '#1e293b';
+        doc.body.innerHTML = 'Cliente solicitou agendamento para a proxima tersa feira no horario da manhan.';
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    iframe.src = 'about:blank';
+  </script>
+</body>
+</html>

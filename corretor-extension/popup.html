@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corretor IA - Groq</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Cabeçalho -->
+    <header class="popup-header">
+      <div class="brand">
+        <div class="logo-badge">C</div>
+        <div>
+          <h1 class="brand-title">Corretor IA</h1>
+          <p class="brand-subtitle">Powered by Groq</p>
+        </div>
+      </div>
+      <div class="status-indicator" title="Pronto para uso">
+        <span class="status-dot"></span>
+        <span class="status-label">Online</span>
+      </div>
+    </header>
+
+    <!-- Abas: Configuração & Testar -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tab-test">Testar Correção</button>
+      <button class="tab-btn" data-tab="tab-config">Configurações</button>
+      <button class="tab-btn" data-tab="tab-help">Como Usar</button>
+    </div>
+
+    <!-- Aba 1: Testar Correção -->
+    <section id="tab-test" class="tab-content active">
+      <div class="field-group">
+        <label for="test-input" class="field-label">Texto para teste:</label>
+        <textarea 
+          id="test-input" 
+          rows="3" 
+          class="field-textarea" 
+          placeholder="Exemplo: nois vai no shoppis sabado pra asisti um filme..."
+        >nois vai no shoppis sabado pra asisti um filme</textarea>
+      </div>
+
+      <button id="btn-run-test" class="btn btn-primary full-width">
+        <span class="btn-icon">✨</span>
+        <span class="btn-text">Corrigir Texto Agora</span>
+      </button>
+
+      <!-- Resultado do Teste -->
+      <div id="test-result-container" class="result-box" style="display: none;">
+        <div class="result-header">
+          <span class="result-label">Versão Corrigida:</span>
+          <button id="btn-copy-test" class="btn-mini">📋 Copiar</button>
+        </div>
+        <div id="test-output" class="result-content"></div>
+      </div>
+    </section>
+
+    <!-- Aba 2: Configurações -->
+    <section id="tab-config" class="tab-content">
+      <form id="config-form">
+        <div class="field-group">
+          <label for="api-key" class="field-label">
+            Chave de API do Groq:
+            <a href="https://console.groq.com/keys" target="_blank" class="link-small">Obter chave</a>
+          </label>
+          <div class="input-password-wrapper">
+            <input 
+              type="password" 
+              id="api-key" 
+              class="field-input" 
+              placeholder="gsk_..." 
+              required
+            >
+            <button type="button" id="btn-toggle-key" class="btn-eye" title="Mostrar/Ocultar">👁️</button>
+          </div>
+          <span class="field-hint">A chave fica salva de forma segura e local no seu navegador.</span>
+        </div>
+
+        <div class="field-group">
+          <label for="model-select" class="field-label">Modelo Groq:</label>
+          <select id="model-select" class="field-select">
+            <option value="qwen/qwen3.8-27b" selected>Qwen 3.8 27B (Recomendado - Ultrarrápido e Preciso)</option>
+            <option value="openai/gpt-oss-120b">GPT OSS 120B (Avançado)</option>
+            <option value="openai/gpt-oss-20b">GPT OSS 20B (Rápido)</option>
+          </select>
+        </div>
+
+        <button type="submit" id="btn-save-config" class="btn btn-emerald full-width">
+          Salvar Configurações
+        </button>
+        <div id="config-status" class="toast-status"></div>
+      </form>
+    </section>
+
+    <!-- Aba 3: Como Usar -->
+    <section id="tab-help" class="tab-content">
+      <div class="help-card">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-info">
+            <strong>Selecione o texto</strong>
+            <p>Selecione qualquer trecho com o mouse ou teclado em qualquer site ou campo de digitação.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-info">
+            <strong>Clique em "Corrigir texto"</strong>
+            <p>Um botão flutuante aparecerá automaticamente próximo da seleção.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-info">
+            <strong>Substitua ou copie</strong>
+            <p>O modal exibe a correção ortográfica e gramatical via Groq para você substituir ou copiar.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="popup-footer">
+      <span>Latência ultra-baixa com Groq LPU™</span>
+      <span class="version-tag">v1.0.0</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
