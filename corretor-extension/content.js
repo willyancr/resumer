@@ -4,7 +4,7 @@
  */
 
 (function () {
-  const VERSION = '1.0.4';
+  const VERSION = '1.0.5';
   if (window.__GROQ_CORRETOR_VERSION__ === VERSION) return;
   window.__GROQ_CORRETOR_VERSION__ = VERSION;
 
@@ -550,20 +550,27 @@ Diretrizes fundamentais:
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), DIRECT_TIMEOUT_MS);
 
+    // Limita max_tokens com base no texto enviado para evitar estourar o limite OTPM gratuito da Groq
+    const estimatedTokens = Math.ceil((text.length / 3.5) + 60);
+    const maxTokens = Math.max(80, Math.min(estimatedTokens * 2, 600));
+
+    const body = {
+      model: config.model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: text }
+      ],
+      temperature: 0.1,
+      max_tokens: maxTokens
+    };
+
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${config.apiKey}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        model: config.model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: text }
-        ],
-        temperature: 0.1
-      }),
+      body: JSON.stringify(body),
       signal: controller.signal
     });
 

@@ -127,6 +127,9 @@ Diretrizes fundamentais:
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos timeout
 
+    const estimatedTokens = Math.ceil((text.length / 3.5) + 60);
+    const maxTokens = Math.max(80, Math.min(estimatedTokens * 2, 600));
+
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -139,7 +142,8 @@ Diretrizes fundamentais:
           { role: 'system', content: systemPrompt },
           { role: 'user', content: text }
         ],
-        temperature: 0.1
+        temperature: 0.1,
+        max_tokens: maxTokens
       }),
       signal: controller.signal
     });
